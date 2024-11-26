@@ -9,6 +9,7 @@
         <UseWPF>true</UseWPF>
         <Title>Factorio Achievements Fixer</Title>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <EnableWindowsTargeting>true</EnableWindowsTargeting>
     </PropertyGroup>
 
 </Project>

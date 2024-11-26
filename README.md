@@ -3,7 +3,7 @@
 This is a WPF-based tool that can be used to re-enable achievements in [Factorio][factorio] after using console commands or the editor.
 
 - Built for Factorio 2.0 Space Age, although it should be compatible with Factorio 1.1.
-- Secure automatic software releases built online with GitHub Actions.
+- [Automatic release builds via GitHub Actions][ga-builds].
 
 ## Usage
 
@@ -31,3 +31,4 @@ I recommend that you
 [factorio]: https://factorio.com/
 [releases]: https://github.com/Xevion/factorio-achievements-fixer/releases
 [csharp-net8_0]: https://dotnet.microsoft.com/download/dotnet/8.0
+[ga-builds]: https://github.com/Xevion/factorio-achievements-fixer/actions/workflows/build.yaml
