@@ -33,10 +33,12 @@ jobs:
         id: extract_version
         run: |
           version=$(grep -oP '(?<=\[assembly: AssemblyVersion\(")[^"]+' ${{ env.SLN_PATH }}/AssemblyInfo.cs)
-          echo "VERSION=$version" >> $GITHUB_ENV
+          echo "result=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: factorio-achievements-fixer-$VERSION
-          path: ${{ env.SLN_PATH }}/bin/Release/net8.0-windows/
+          name: factorio-achievements-fixer-{{ steps.extract_version.outputs.result }}
+          if-no-files-found: error
+          compression-level: 0
+          path: ${{ env.SLN_PATH }}/bin/Release/net8.0-windows/win-x86/publish/factorio-achievements-fixer.exe
