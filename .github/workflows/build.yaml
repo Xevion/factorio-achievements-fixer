@@ -29,15 +29,15 @@ jobs:
       - name: Build Application
         run: dotnet publish ${{ env.SLN_PATH }} --no-restore
 
-      - name: Extract Version
-        id: extract_version
+      - name: Get Version
+        id: get_version
         run: |
-          version=$(grep -oP '(?<=\[assembly: AssemblyVersion\(")[^"]+' ${{ env.SLN_PATH }}/AssemblyInfo.cs)
+          VERSION=$(grep -oP '(?<=\[assembly: AssemblyVersion\(")[^"]+' ${{ env.SLN_PATH }}/AssemblyInfo.cs)
           echo "result=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: factorio-achievements-fixer-${{ steps.extract_version.outputs.result }}
+          name: factorio-achievements-fixer-${{ steps.get_version.outputs.result }}
           if-no-files-found: error
           path: ${{ env.SLN_PATH }}/bin/Release/net8.0-windows/win-x86/publish/factorio-achievements-fixer.exe
