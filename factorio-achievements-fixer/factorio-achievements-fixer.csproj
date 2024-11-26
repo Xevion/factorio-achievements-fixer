@@ -11,6 +11,10 @@
         <Title>Factorio Achievements Fixer</Title>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <EnableWindowsTargeting>true</EnableWindowsTargeting>
+        <IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
+        <PublishReadyToRun>true</PublishReadyToRun>
+        <PublishSingleFile>true</PublishSingleFile>
+        <SelfContained>false</SelfContained>
+        <!-- <PublishTrimmed>true</PublishTrimmed> -->
     </PropertyGroup>
-
 </Project>
