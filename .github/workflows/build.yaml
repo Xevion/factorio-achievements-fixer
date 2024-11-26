@@ -39,4 +39,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: factorio-achievements-fixer-$VERSION
-          path:
+          path: ${{ env.SLN_PATH }}/bin/Release/net8.0-windows/
