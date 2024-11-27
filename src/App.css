@@ -4,7 +4,7 @@
 
 html,
 body {
-  @apply h-screen w-screen bg-zinc-600;
+  @apply h-screen w-screen bg-zinc-600 text-zinc-200;
 }
 
 @layer base {
