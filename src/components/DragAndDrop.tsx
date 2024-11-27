@@ -19,11 +19,20 @@ export default function DragAndDrop({ className, onFile }: DragAndDropProps) {
   const [isHovering, setIsHovering] = useState<HoverState>("off");
 
   async function isValid(paths: string[]): Promise<boolean> {
-    console.log({ paths });
     return paths.length === 1 && paths[0].endsWith(".zip") && exists(paths[0]);
   }
 
   useEffect(() => {
+    const unlistenDrop = listen<DragDropEvent & { type: "drop" }>(
+      "tauri://drag-drop",
+      async (event) => {
+        setIsHovering("off");
+        if (await isValid(event.payload.paths)) {
+          onFile(event.payload.paths[0]);
+        }
+      }
+    ).then((fn) => fn);
+
     const unlistenEnter = listen<DragDropEvent & { type: "enter" }>(
       "tauri://drag-enter",
       async (event) => {
@@ -37,8 +46,11 @@ export default function DragAndDrop({ className, onFile }: DragAndDropProps) {
     }).then((fn) => fn);
 
     return () => {
-      unlistenEnter.then(() => {});
-      unlistenLeave.then(() => {});
+      Promise.all([unlistenDrop, unlistenEnter, unlistenLeave]).then(
+        (results) => {
+          console.log("DragAndDrop listeners removed.", results);
+        }
+      );
     };
   });
 
@@ -54,13 +66,13 @@ export default function DragAndDrop({ className, onFile }: DragAndDropProps) {
       title: "Select a save file",
       filters: [
         {
-          name: "ZIP Archive",
+          name: "Factorio Save File",
           extensions: ["zip"],
         },
       ],
     });
 
-    if (selectedFile !== null) {
+    if (selectedFile !== null && (await exists(selectedFile))) {
       onFile(selectedFile);
     }
   }
@@ -76,7 +88,8 @@ export default function DragAndDrop({ className, onFile }: DragAndDropProps) {
           {
             "hover:bg-zinc-800  hover:border-zinc-500": isHovering === "off",
             "bg-zinc-800 border-zinc-500": isHovering === "valid",
-            "bg-red-800/25 border-red-700/25": isHovering === "invalid",
+            "bg-red-800/25 border-red-700/25 cursor-not-allowed":
+              isHovering === "invalid",
           }
         )}
       >
