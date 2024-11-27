@@ -40,7 +40,7 @@ export default function SaveSelector() {
                   {file.name}
                 </div>
                 <div className="pl-1 shrink-0">{file.last_modified}</div>
-                {","}
+                <span className="text-zinc-300">,</span>
                 <div className="pl-1 shrink-0">{file.size}</div>
               </div>
             </div>
