@@ -13,20 +13,33 @@ interface DragAndDropProps {
   onFile: (path: string) => void;
 }
 
-type HoverState = "off" | "valid" | "invalid";
-
 export default function DragAndDrop({ className, onFile }: DragAndDropProps) {
-  const [isHovering, setIsHovering] = useState<HoverState>("off");
+  const [hoverState, setIsHovering] = useState<
+    | {
+        state: "off" | "valid";
+      }
+    | {
+        state: "invalid";
+        detail: string;
+      }
+  >({ state: "off" });
 
-  async function isValid(paths: string[]): Promise<boolean> {
-    return paths.length === 1 && paths[0].endsWith(".zip") && exists(paths[0]);
+  async function isValid(
+    paths: string[]
+  ): Promise<{ valid: true } | { valid: false; detail: string }> {
+    if (paths.length !== 1) return { valid: false, detail: "Only one file" };
+    if (!paths[0].endsWith(".zip"))
+      return { valid: false, detail: "Not a .zip file" };
+    if (!(await exists(paths[0])))
+      return { valid: false, detail: "File does not exist" };
+    return { valid: true };
   }
 
   useEffect(() => {
     const unlistenDrop = listen<DragDropEvent & { type: "drop" }>(
       "tauri://drag-drop",
       async (event) => {
-        setIsHovering("off");
+        setIsHovering({ state: "off" });
         if (await isValid(event.payload.paths)) {
           onFile(event.payload.paths[0]);
         }
@@ -36,13 +49,14 @@ export default function DragAndDrop({ className, onFile }: DragAndDropProps) {
     const unlistenEnter = listen<DragDropEvent & { type: "enter" }>(
       "tauri://drag-enter",
       async (event) => {
-        if (await isValid(event.payload.paths)) setIsHovering("valid");
-        else setIsHovering("invalid");
+        const result = await isValid(event.payload.paths);
+        if (result.valid) setIsHovering({ state: "valid" });
+        else setIsHovering({ state: "invalid", detail: result.detail });
       }
     ).then((fn) => fn);
 
     const unlistenLeave = listen("tauri://drag-leave", () => {
-      setIsHovering("off");
+      setIsHovering({ state: "off" });
     }).then((fn) => fn);
 
     return () => {
@@ -86,22 +100,29 @@ export default function DragAndDrop({ className, onFile }: DragAndDropProps) {
         className={cn(
           "flex flex-col items-center justify-center w-full h-64 border-2  border-dashed rounded-lg cursor-pointer  bg-zinc-700 border-zinc-600",
           {
-            "hover:bg-zinc-800  hover:border-zinc-500": isHovering === "off",
-            "bg-zinc-800 border-zinc-500": isHovering === "valid",
+            "hover:bg-zinc-800  hover:border-zinc-500":
+              hoverState.state === "off",
+            "bg-zinc-800 border-zinc-500": hoverState.state === "valid",
             "bg-red-800/25 border-red-700/25 cursor-not-allowed":
-              isHovering === "invalid",
+              hoverState.state === "invalid",
           }
         )}
       >
         <div className="flex flex-col items-center justify-center pt-5 pb-6">
-          <FolderArrowDownIcon className="w-8 h-8 mb-4 text-zinc-500 dark:text-zinc-400" />
-          <p className="mb-2 text-sm text-zinc-500 dark:text-zinc-400">
-            <span className="font-semibold">Click to select</span> or drag and
-            drop a save file
-          </p>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">
-            <Monoblock>.zip</Monoblock> files only
-          </p>
+          <FolderArrowDownIcon className="w-8 h-8 mb-4 text-zinc-400" />
+          {hoverState.state !== "invalid" ? (
+            <>
+              <p className="mb-2 text-sm text-zinc-400">
+                <span className="font-semibold">Click to select</span> or drag
+                and drop a save file
+              </p>
+              <p className="text-xs text-zinc-400">
+                <Monoblock>.zip</Monoblock> files only
+              </p>
+            </>
+          ) : (
+            <p className="text-sm text-red-400">{hoverState.detail}</p>
+          )}
         </div>
       </label>
     </div>

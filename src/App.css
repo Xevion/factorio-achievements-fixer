@@ -27,16 +27,16 @@ body {
 
   /* Track */
   ::-webkit-scrollbar-track {
-    @apply bg-zinc-200 dark:bg-zinc-700 rounded-lg;
+    @apply bg-zinc-700 rounded-lg;
   }
 
   /* Handle */
   ::-webkit-scrollbar-thumb {
-    @apply bg-zinc-400 dark:bg-zinc-500 rounded-xl;
+    @apply bg-zinc-500 rounded-xl;
   }
 
   /* Handle on hover */
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-zinc-500 dark:bg-zinc-400 rounded-lg;
+    @apply bg-zinc-400 rounded-lg;
   }
 }
