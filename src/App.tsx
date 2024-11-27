@@ -1,10 +1,22 @@
+import { useState } from "preact/hooks";
 import "./App.css";
 import SaveSelector from "./views/SaveSelector";
+import Patcher from "./views/Patcher";
 
 function App() {
+  const [currentSave, setCurrentSave] = useState<string | null>(null);
+
   return (
     <main class="h-[100vh] w-[100vw] bg-zinc-800 px-4 py-2 flex flex-col">
-      <SaveSelector />
+      {currentSave === null ? (
+        <SaveSelector
+          onFile={(path) => {
+            setCurrentSave(path);
+          }}
+        />
+      ) : (
+        <Patcher path={currentSave} />
+      )}
     </main>
   );
 }
