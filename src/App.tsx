@@ -7,7 +7,7 @@ function App() {
   const [currentSave, setCurrentSave] = useState<string | null>(null);
 
   return (
-    <main class="h-[100vh] w-[100vw] bg-zinc-800 px-4 py-2 flex flex-col">
+    <main class="h-[100vh] w-[100vw] bg-zinc-800 px-3 py-2 flex flex-col">
       {currentSave === null ? (
         <SaveSelector
           onFile={(path) => {
