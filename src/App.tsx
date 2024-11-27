@@ -15,7 +15,12 @@ function App() {
           }}
         />
       ) : (
-        <Patcher path={currentSave} />
+        <Patcher
+          path={currentSave}
+          onComplete={() => {
+            setCurrentSave(null);
+          }}
+        />
       )}
     </main>
   );
