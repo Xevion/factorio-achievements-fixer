@@ -1,49 +1,52 @@
-import { useState } from "preact/hooks";
-import preactLogo from "./assets/preact.svg";
 import { invoke } from "@tauri-apps/api/core";
 import "./App.css";
 
-function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
+import DragAndDrop from "./components/DragAndDrop";
+import { useEffect, useState } from "preact/hooks";
+import { FolderIcon } from "@heroicons/react/20/solid";
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
-  }
+type SaveFile = {
+  name: string;
+  path: string;
+  size: string;
+};
+
+function App() {
+  const [saveFiles, setSaveFiles] = useState<SaveFile[]>([]);
+
+  useEffect(() => {
+    // On startup, find all save files and list them for easy selection
+    invoke<SaveFile[]>("find_save_files").then((files) => {
+      setSaveFiles(files);
+    });
+  }, []);
 
   return (
-    <main class="container">
-      <h1>Welcome to Tauri + Preact</h1>
-
-      <div class="row">
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" class="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" class="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://preactjs.com" target="_blank">
-          <img src={preactLogo} class="logo preact" alt="Preact logo" />
-        </a>
+    <main class="h-[100vh] w-[100vw] bg-zinc-800 p-4">
+      <DragAndDrop className="mr-1.5 bg-red-500!" onFile={() => {}} />
+      <div className="max-h-[50vh] mt-2.5 overflow-y-auto pr-1.5">
+        {saveFiles.map((file) => {
+          return (
+            <div
+              class="flex items-center justify-between p-1 bg-zinc-700 rounded-lg mb-2 hover:bg-zinc-600 group"
+              title={file.path}
+            >
+              <div class="flex items-center">
+                <FolderIcon class="w-6 h-6 text-zinc-400 ml-0.5 mt-0.5 mr-1.5" />
+                <div>
+                  <p class="text-zinc-400">
+                    <span class="text-sm font-semibold text-zinc-100">
+                      {file.name}
+                    </span>
+                    {"  "}
+                    <span className="text-sm">({file.size})</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
-      <p>Click on the Tauri, Vite, and Preact logos to learn more.</p>
-
-      <form
-        class="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
-      >
-        <input
-          id="greet-input"
-          onInput={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <button type="submit">Greet</button>
-      </form>
-      <p>{greetMsg}</p>
     </main>
   );
 }
