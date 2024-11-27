@@ -861,6 +861,7 @@ name = "factorio-achievements-fixer"
 version = "0.1.0"
 dependencies = [
  "human_bytes",
+ "humanize-duration",
  "serde",
  "serde_json",
  "simple-home-dir",
@@ -1420,6 +1421,15 @@ name = "human_bytes"
 version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "91f255a4535024abf7640cb288260811fc14794f62b063652ed349f9a6c2348e"
+
+[[package]]
+name = "humanize-duration"
+version = "0.0.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "082247a9fa508369fe52b235aef8a8dbf931b08d223a1a9b70cd400a8a77ae9c"
+dependencies = [
+ "time",
+]
 
 [[package]]
 name = "hyper"

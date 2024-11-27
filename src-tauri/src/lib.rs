@@ -1,9 +1,48 @@
 use human_bytes::human_bytes;
+use humanize_duration::prelude::DurationExt;
+use humanize_duration::Unit;
+use humanize_duration::{types::DurationParts, unit, Formatter, Truncate};
 use serde::Serialize;
 use simple_home_dir::home_dir;
 use std::fs;
 use std::fs::metadata;
-use time::OffsetDateTime;
+
+struct SlimFormatter;
+
+unit!(MyYear, "y", "y");
+unit!(MyMonth, "mon", "mon");
+unit!(MyDay, "d", "d");
+unit!(MyHour, "h", "h");
+unit!(MyMinute, "m", "m");
+unit!(MySecond, "s", "s");
+unit!(MyMillis, "ms", "ms");
+unit!(MyMicro, "mms", "mms");
+unit!(MyNano, "ns", "ns");
+
+impl Formatter for SlimFormatter {
+    fn get(&self, truncate: Truncate) -> Box<dyn Unit> {
+        match truncate {
+            Truncate::Nano => Box::new(MyNano),
+            Truncate::Micro => Box::new(MyMicro),
+            Truncate::Millis => Box::new(MyMillis),
+            Truncate::Second => Box::new(MySecond),
+            Truncate::Minute => Box::new(MyMinute),
+            Truncate::Hour => Box::new(MyHour),
+            Truncate::Day => Box::new(MyDay),
+            Truncate::Month => Box::new(MyMonth),
+            Truncate::Year => Box::new(MyYear),
+        }
+    }
+
+    fn format(
+        &self,
+        f: &mut std::fmt::Formatter<'_>,
+        parts: DurationParts,
+        truncate: Truncate,
+    ) -> std::fmt::Result {
+        self.format_default(f, parts, truncate)
+    }
+}
 
 #[cfg(target_os = "windows")]
 fn get_save_directories() -> Vec<String> {
@@ -52,17 +91,14 @@ fn get_save_directories() -> Vec<String> {
     save_directories
 }
 
-struct SaveFileInternal {
-    path: String,
-    last_modified: usize,
-}
-
 #[derive(Serialize, Debug)]
 struct SaveFile {
     name: String,
     path: String,
     size: String,
     last_modified: String,
+    #[serde(skip_serializing)]
+    modified_delta: usize,
 }
 
 #[tauri::command]
@@ -98,6 +134,7 @@ fn find_save_files() -> Vec<SaveFile> {
     let save_directories = get_save_directories();
     let mut save_files = Vec::new();
 
+    // Collect all save files
     for dir in save_directories {
         println!("Save directory found: {}", dir);
         if let Ok(entries) = fs::read_dir(dir) {
@@ -109,27 +146,55 @@ fn find_save_files() -> Vec<SaveFile> {
 
                     let file_path = entry.path();
                     if let Ok(metadata) = metadata(&file_path) {
-                        let size = human_bytes(metadata.len() as f64);
-                        let last_modified =
-                            Into::<OffsetDateTime>::into(metadata.modified().unwrap())
-                                .format(
-                                    &time::format_description::parse(
-                                        "[year]-[month]-[day] [hour]:[minute]:[second]",
-                                    )
-                                    .unwrap(),
+                        let modified = metadata.modified();
+                        if modified.is_err() {
+                            continue;
+                        }
+
+                        let modified_elapsed = match modified.unwrap().elapsed() {
+                            Ok(elapsed) => elapsed,
+                            Err(_) => continue,
+                        };
+                        let modified_elapsed_secs = modified_elapsed.as_secs();
+
+                        let human_last_modified = if modified_elapsed_secs < 60 {
+                            if modified_elapsed_secs < 10 {
+                                "just now".to_string()
+                            } else {
+                                "< 1min".to_string()
+                            }
+                        } else {
+                            modified_elapsed
+                                .human_with_format(
+                                    match modified_elapsed_secs / 60 {
+                                        m if m < 60 => Truncate::Minute,
+                                        m if m < 60 * 36 => Truncate::Hour,
+                                        m if m < 60 * 24 * 31 => Truncate::Day,
+                                        m if m < 60 * 24 * 31 * 18 => Truncate::Month,
+                                        _ => Truncate::Year,
+                                    },
+                                    SlimFormatter,
                                 )
-                                .unwrap();
+                                .to_string()
+                                .replace(" ", "")
+                                + " ago"
+                        };
+
                         save_files.push(SaveFile {
                             name: file_name.to_string(),
+                            size: human_bytes(metadata.len() as f64),
                             path: file_path.to_str().unwrap().to_string(),
-                            size,
-                            last_modified,
+                            last_modified: human_last_modified,
+                            modified_delta: modified_elapsed_secs as usize,
                         });
                     }
                 }
             }
         }
     }
+
+    // Sort the save files by last modified time
+    save_files.sort_by(|a, b| a.modified_delta.cmp(&b.modified_delta));
 
     save_files
 }

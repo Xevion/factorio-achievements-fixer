@@ -7,6 +7,7 @@ type SaveFile = {
   name: string;
   path: string;
   size: string;
+  last_modified: string;
 };
 
 export default function SaveSelector() {
@@ -15,6 +16,7 @@ export default function SaveSelector() {
   useEffect(() => {
     // On startup, find all save files and list them for easy selection
     invoke<SaveFile[]>("find_save_files").then((files) => {
+      console.log("Save Files Acquired", files);
       setSaveFiles(files);
     });
   }, []);
@@ -32,14 +34,14 @@ export default function SaveSelector() {
               class="flex items-center justify-between p-1 hover:cursor-pointer bg-zinc-700 rounded hover:bg-zinc-600 group"
               title={file.path}
             >
-              <div className="flex justify-between w-full items-center">
-                <FolderIcon class="inline w-6 h-6 shrink-0 text-zinc-400 ml-0.5 mt-0.5 mr-1.5" />
-                <div className="grow text-sm font-medium text-zinc-200 truncate">
+              <div className="flex justify-between text-zinc-400 w-full items-center text-sm">
+                <FolderIcon class="inline w-6 h-6 shrink-0 ml-0.5 mt-0.5 mr-1.5" />
+                <div className="grow font-medium text-zinc-200 truncate">
                   {file.name}
                 </div>
-                <div className="text-sm text-zinc-400 pl-1 shrink-0">
-                  {file.size}
-                </div>
+                <div className="pl-1 shrink-0">{file.last_modified}</div>
+                {","}
+                <div className="pl-1 shrink-0">{file.size}</div>
               </div>
             </div>
           );
