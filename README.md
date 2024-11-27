@@ -1,6 +1,6 @@
 # factorio-achievements-fixer
 
-This is a WPF-based tool that can be used to re-enable achievements in [Factorio][factorio] after using console commands or the editor.
+This is a Tauri-based tool that can be used to re-enable achievements in [Factorio][factorio] after using console commands or the editor.
 
 - Built for Factorio 2.0 Space Age, although it should be compatible with Factorio 1.1.
 - [Automatic release builds via GitHub Actions][ga-builds].
@@ -31,15 +31,8 @@ I made this tool and developed my method from the following sources/discussions 
 
 ## Compiling
 
-1. Clone the repository.
-2. Ensure [.NET 8.0 SDK][csharp-net8_0] is installed.
-3. Open a terminal in the project directory, then navigate to `./factorio-achievements-fixer`.
-4. Run `dotnet build -c Release` to compile the project.
-5. The compiled executable will be in `bin/Release/net8.0-windows`.
-   - Shortcut command: `mv bin/Release/net8.0-windows/factorio-achievements-fixer.exe ./`
-   - You can also use `dotnet run -c Release` to compile & immediately run the program.
+TBD
 
 [factorio]: https://factorio.com/
 [releases]: https://github.com/Xevion/factorio-achievements-fixer/releases
-[csharp-net8_0]: https://dotnet.microsoft.com/download/dotnet/8.0
 [ga-builds]: https://github.com/Xevion/factorio-achievements-fixer/actions/workflows/build.yaml
