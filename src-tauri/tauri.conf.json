@@ -12,6 +12,7 @@
   "app": {
     "windows": [
       {
+        "maximizable": false,
         "title": "Factorio Achievements Fixer",
         "width": 450,
         "height": 650,
