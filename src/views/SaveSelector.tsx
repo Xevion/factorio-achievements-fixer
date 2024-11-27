@@ -10,7 +10,11 @@ type SaveFile = {
   last_modified: string;
 };
 
-export default function SaveSelector() {
+interface SaveSelectorProps {
+  onFile?: (path: string) => void;
+}
+
+export default function SaveSelector({ onFile }: SaveSelectorProps) {
   const [saveFiles, setSaveFiles] = useState<SaveFile[]>([]);
 
   useEffect(() => {
@@ -21,11 +25,12 @@ export default function SaveSelector() {
     });
   }, []);
 
-  function Item({ file }: { file: SaveFile }) {
+  function Item({ file, onClick }: { file: SaveFile; onClick: () => void }) {
     return (
       <div
         class="flex items-center justify-between p-1 hover:cursor-pointer bg-zinc-700 rounded hover:bg-zinc-600 group"
         title={file.path}
+        onClick={onClick}
       >
         <div className="flex justify-between text-zinc-400 w-full items-center text-sm">
           <FolderIcon class="inline w-6 h-6 shrink-0 ml-0.5 mt-0.5 mr-1.5" />
@@ -42,13 +47,20 @@ export default function SaveSelector() {
 
   return (
     <>
-      <DragAndDrop className="mr-1.5 bg-red-500!" onFile={() => {}} />
+      <DragAndDrop className="mr-1.5" onFile={onFile} />
       <div className="mt-1 text-center select-none text-zinc-300 text-[0.85rem]">
         Or, select a save file from below
       </div>
       <div className="mt-1.5 overflow-y-auto overflow-x-hidden pr-2 space-y-2">
         {saveFiles.map((file) => {
-          return <Item file={file} />;
+          return (
+            <Item
+              onClick={() => {
+                onFile?.(file.path);
+              }}
+              file={file}
+            />
+          );
         })}
       </div>
     </>

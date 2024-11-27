@@ -10,7 +10,7 @@ import { DragDropEvent } from "@tauri-apps/api/webview";
 
 interface DragAndDropProps {
   className?: string;
-  onFile: (path: string) => void;
+  onFile?: (path: string) => void;
 }
 
 export default function DragAndDrop({ className, onFile }: DragAndDropProps) {
@@ -41,7 +41,7 @@ export default function DragAndDrop({ className, onFile }: DragAndDropProps) {
       async (event) => {
         setIsHovering({ state: "off" });
         if (await isValid(event.payload.paths)) {
-          onFile(event.payload.paths[0]);
+          onFile?.(event.payload.paths[0]);
         }
       }
     ).then((fn) => fn);
@@ -87,7 +87,7 @@ export default function DragAndDrop({ className, onFile }: DragAndDropProps) {
     });
 
     if (selectedFile !== null && (await exists(selectedFile))) {
-      onFile(selectedFile);
+      onFile?.(selectedFile);
     }
   }
 
