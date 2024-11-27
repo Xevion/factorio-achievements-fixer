@@ -8,13 +8,13 @@ interface MonoblockProps {
 
 export default function Monoblock({ className, children }: MonoblockProps) {
   return (
-    <div
+    <span
       className={cn(
         "inline-block border-zinc-500 px-0.5 border bg-zinc-800 rounded",
         className
       )}
     >
       {children}
-    </div>
+    </span>
   );
 }
