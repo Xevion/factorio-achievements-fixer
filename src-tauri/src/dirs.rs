@@ -101,14 +101,13 @@ pub fn find_save_files() -> Vec<SaveFile> {
                                 )
                                 .to_string()
                                 .replace(" ", "")
-                                + " ago"
                         };
 
                         save_files.push(SaveFile {
                             name: file_name.to_string(),
                             size: human_bytes(metadata.len() as f64),
                             path: file_path.to_str().unwrap().to_string(),
-                            last_modified: human_last_modified,
+                            last_modified: human_last_modified + " ago",
                             modified_delta: modified_elapsed_secs as usize,
                         });
                     }
