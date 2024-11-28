@@ -26,7 +26,10 @@ export default function Logs() {
 
   return (
     <div className="bg-black/40 py-2.5 rounded">
-      <p className="text-xs font-medium mx-2.5">Logs</p>
+      <p className="text-xs font-medium px-2.5 border-b border-zinc-700 pb-1 text-zinc-300">
+        Logs
+      </p>
+
       <div className="flex flex-col space-y-1 mt-1 text-zinc-400">
         {data.map((log) => {
           return (
