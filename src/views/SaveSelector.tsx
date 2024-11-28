@@ -2,6 +2,7 @@ import { invoke } from "@tauri-apps/api/core";
 import DragAndDrop from "../components/DragAndDrop";
 import { useEffect, useState } from "preact/hooks";
 import { FolderIcon } from "@heroicons/react/20/solid";
+import { cn } from "../utils";
 
 type SaveFile = {
   name: string;
@@ -48,21 +49,32 @@ export default function SaveSelector({ onFile }: SaveSelectorProps) {
   return (
     <>
       <DragAndDrop className="mr-1.5" onFile={onFile} />
-      <div className="mt-1 text-center select-none text-zinc-300 text-[0.85rem]">
-        Or, select a save file from below
+      <div
+        className={cn(
+          "mt-1 text-center select-none text-zinc-300 text-[0.85rem]",
+          { "italic text-zinc-400": saveFiles.length == 0 }
+        )}
+      >
+        {saveFiles.length > 0
+          ? "Or, select a save file from below"
+          : "No save files found..."}
       </div>
-      <div className="mt-1.5 overflow-y-auto overflow-x-hidden pr-2 space-y-2">
-        {saveFiles.map((file) => {
-          return (
-            <Item
-              onClick={() => {
-                onFile?.(file.path);
-              }}
-              file={file}
-            />
-          );
-        })}
-      </div>
+      {saveFiles.length > 0 ? (
+        <>
+          <div className="mt-1.5 overflow-y-auto overflow-x-hidden pr-2 space-y-2">
+            {saveFiles.map((file) => {
+              return (
+                <Item
+                  onClick={() => {
+                    onFile?.(file.path);
+                  }}
+                  file={file}
+                />
+              );
+            })}
+          </div>
+        </>
+      ) : null}
     </>
   );
 }
