@@ -27,7 +27,7 @@ fn get_save_directories() -> Vec<String> {
     if let Some(home_dir) = home_dir() {
         let normal_save_path = home_dir.join(".factorio/saves");
         if normal_save_path.exists() {
-            save_directories.push(save_path.to_str().unwrap().to_string());
+            save_directories.push(normal_save_path.to_str().unwrap().to_string());
         }
 
         let flatpak_save_path = home_dir.join(".var/app/com.valvesoftware.Steam/.factorio/saves");
