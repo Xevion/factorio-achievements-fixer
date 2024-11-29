@@ -1,5 +1,7 @@
 mod dirs;
 mod format;
+mod pack;
+mod patch;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
